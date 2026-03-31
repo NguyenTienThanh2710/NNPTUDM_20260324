@@ -90,9 +90,10 @@ router.post('/', CheckLogin, async function (req, res, next) {
     });
 
     let result = await newMessage.save();
-    result = await result
-      .populate('from', 'username fullName avatarUrl')
-      .populate('to', 'username fullName avatarUrl');
+    result = await result.populate([
+      { path: 'from', select: 'username fullName avatarUrl' },
+      { path: 'to', select: 'username fullName avatarUrl' }
+    ]);
 
     res.send(result);
   } catch (err) {

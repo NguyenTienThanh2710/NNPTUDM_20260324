@@ -14,25 +14,18 @@ let cartSchema = require('../schemas/carts')
 
 
 router.post('/register', RegisterValidator, validationResult, async function (req, res, next) {
-    let session = await mongoose.startSession();
-    session.startTransaction()
     try {
         let newItem = await userController.CreateAnUser(
             req.body.username, req.body.password, req.body.email,
-            "69af870aaa71c433fa8dda8e", session
+            "69af870aaa71c433fa8dda8e"
         )
         let newCart = new cartSchema({
             user: newItem._id
         })
-        await newCart.save({ session });
+        await newCart.save();
         await newCart.populate('user');
-        await session.commitTransaction()
-        await session.endSession()
         res.send(newCart);
-
     } catch (err) {
-        await session.abortTransaction()
-        await session.endSession()
         res.status(400).send({ message: err.message });
     }
 })
